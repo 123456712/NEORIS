@@ -2,6 +2,7 @@ package com.claro.WSCarMaintence.servicio.ws.rest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.ParameterMode;
@@ -10,6 +11,7 @@ import javax.persistence.StoredProcedureQuery;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.claro.WSCarMaintence.model.Autor;
+import com.claro.WSCarMaintence.model.Categoria;
 
 
 @RestController
@@ -32,7 +35,7 @@ public class AutorController {
 		this.entityManager = entityManager;
 	}
 
-	@PostMapping(path = "/consultar")
+	@GetMapping(path = "/consultar")
 	public ResponseEntity <List<Autor>> consultarAutor(@RequestParam(name = "id_autor", required = false) Integer id_autor) {
 		List<Autor> autor = new ArrayList<Autor>();
 
@@ -53,7 +56,8 @@ public class AutorController {
         
         // Realizamos la llamada al procedimiento
         storedProcedureQuery.execute();
-        autor = (List <Autor>)storedProcedureQuery.getResultList();
+        List<Object[]> results = storedProcedureQuery.getResultList();
+        autor = results.stream().map(result -> new Autor((Integer) result[0],(String) result[1])).collect(Collectors.toList());
  
         // Obtenemos los valores de salida
         final Integer codigo = (Integer) storedProcedureQuery.getOutputParameterValue("OUT_CODIGO");

@@ -14,51 +14,77 @@ import javax.persistence.Table;
 
 
 public class Prestamo { 
+	
+	private Integer id_prestamo;
+	private Integer id_libro;
+	private String nombre_libro;
+	private Date fecha_maxima_entrega;
+	private Date fecha_entrega;
+	private Integer id_usuario;
+	
+	public Prestamo() {
+	}
+	
+	public Prestamo(Integer id_prestamo, Integer id_libro, String nombre_libro, Date fecha_maxima_entrega,
+			Date fecha_entrega, Integer id_usuario) {
+		super();
+		this.id_prestamo = id_prestamo;
+		this.id_libro = id_libro;
+		this.nombre_libro = nombre_libro;
+		this.fecha_maxima_entrega = fecha_maxima_entrega;
+		this.fecha_entrega = fecha_entrega;
+		this.id_usuario = id_usuario;
+	}
 
-	private int id_prestamo;
-	private Date fechaInicioPrestamo;
-	private Date fechaFinPrestamo;
-	private int fk_id_producto;
-	private int fk_id_usuario;
-	private int fk_prestamoPadre;
-	
-	
-	public int getId_prestamo() {
+	public Integer getId_prestamo() {
 		return id_prestamo;
 	}
-	public void setId_prestamo(int id_prestamo) {
+
+	public void setId_prestamo(Integer id_prestamo) {
 		this.id_prestamo = id_prestamo;
 	}
-	public Date getFechaInicioPrestamo() {
-		return fechaInicioPrestamo;
+
+	public Integer getId_libro() {
+		return id_libro;
 	}
-	public void setFechaInicioPrestamo(Date fechaInicioPrestamo) {
-		this.fechaInicioPrestamo = fechaInicioPrestamo;
+
+	public void setId_libro(Integer id_libro) {
+		this.id_libro = id_libro;
 	}
-	public Date getFechaFinPrestamo() {
-		return fechaFinPrestamo;
+
+	public String getNombre_libro() {
+		return nombre_libro;
 	}
-	public void setFechaFinPrestamo(Date fechaFinPrestamo) {
-		this.fechaFinPrestamo = fechaFinPrestamo;
+
+	public void setNombre_libro(String nombre_libro) {
+		this.nombre_libro = nombre_libro;
 	}
-	public int getFk_id_producto() {
-		return fk_id_producto;
+
+	public Date getFecha_maxima_entrega() {
+		return fecha_maxima_entrega;
 	}
-	public void setFk_id_producto(int fk_id_producto) {
-		this.fk_id_producto = fk_id_producto;
+
+	public void setFecha_maxima_entrega(Date fecha_maxima_entrega) {
+		this.fecha_maxima_entrega = fecha_maxima_entrega;
 	}
-	public int getFk_id_usuario() {
-		return fk_id_usuario;
+
+	public Date getFecha_entrega() {
+		return fecha_entrega;
 	}
-	public void setFk_id_usuario(int fk_id_usuario) {
-		this.fk_id_usuario = fk_id_usuario;
+
+	public void setFecha_entrega(Date fecha_entrega) {
+		this.fecha_entrega = fecha_entrega;
 	}
-	public int getFk_prestamoPadre() {
-		return fk_prestamoPadre;
+
+	public Integer getId_usuario() {
+		return id_usuario;
 	}
-	public void setFk_prestamoPadre(int fk_prestamoPadre) {
-		this.fk_prestamoPadre = fk_prestamoPadre;
+
+	public void setId_usuario(Integer id_usuario) {
+		this.id_usuario = id_usuario;
 	}
+	
+	
 	
 	
 }

@@ -4,70 +4,89 @@ import java.util.Date;
 
 public class Producto {
    
-
-	private int id_producto;
-	
-	private int fk_idCategoria;
-
-	private String cantidadEjemplares;
-
-	private int periodoMaximoPrestamo;
-	
+	private String tipo;
+	private Date fecha_inactivacion;
+	private Integer cantidad_ejemplares;
+	private Integer id_producto;
+	private Integer max_periodo_prestamo;
+	private Integer id_Categoria;
+	private String nombre_categoria;
 	private String titulo;
-
-	private Date fechaInactivacion;
-
-
-	private Date fechaIngreso;
-
-    private String autores;
-
-/*
-	@OneToMany(mappedBy = "producto")
-    List<Mantenimiento> mantenimientos;
+	private Date fecha_llegada_biblioteca;
+	private Integer cantidad_ejemplares_disponibles;
+	private String autores;
 	
-
-	public Producto() {
+	public Producto(String tipo, Date fecha_inactivacion, Integer cantidad_ejemplares, Integer id_producto,
+			Integer max_periodo_prestamo, Integer id_Categoria, String nombre_categoria, String titulo,
+			Date fecha_llegada_biblioteca, Integer cantidad_ejemplares_disponibles, String autores) {
+		super();
+		this.tipo = tipo;
+		this.fecha_inactivacion = fecha_inactivacion;
+		this.cantidad_ejemplares = cantidad_ejemplares;
+		this.id_producto = id_producto;
+		this.max_periodo_prestamo = max_periodo_prestamo;
+		this.id_Categoria = id_Categoria;
+		this.nombre_categoria = nombre_categoria;
+		this.titulo = titulo;
+		this.fecha_llegada_biblioteca = fecha_llegada_biblioteca;
+		this.cantidad_ejemplares_disponibles = cantidad_ejemplares_disponibles;
+		this.autores = autores;
 	}
 
-	public int getId() {
-		return id;
+	public String getTipo() {
+		return tipo;
 	}
 
-	public void setId(int id) {
-		this.id = id;
+	public void setTipo(String tipo) {
+		this.tipo = tipo;
 	}
 
-	public Categoria getCategoria() {
-		return categoria;
+	public Date getFecha_inactivacion() {
+		return fecha_inactivacion;
 	}
 
-	public void setCategoria(Categoria categoria) {
-		this.categoria = categoria;
+	public void setFecha_inactivacion(Date fecha_inactivacion) {
+		this.fecha_inactivacion = fecha_inactivacion;
 	}
 
-	public String getTipoProducto() {
-		return tipoProducto;
+	public Integer getCantidad_ejemplares() {
+		return cantidad_ejemplares;
 	}
 
-	public void setTipoProducto(String tipoProducto) {
-		this.tipoProducto = tipoProducto;
+	public void setCantidad_ejemplares(Integer cantidad_ejemplares) {
+		this.cantidad_ejemplares = cantidad_ejemplares;
 	}
 
-	public int getCantidadEjemplares() {
-		return cantidadEjemplares;
+	public Integer getId_producto() {
+		return id_producto;
 	}
 
-	public void setCantidadEjemplares(int cantidadEjemplares) {
-		this.cantidadEjemplares = cantidadEjemplares;
+	public void setId_producto(Integer id_producto) {
+		this.id_producto = id_producto;
 	}
 
-	public int getPeriodoMaximoPrestamo() {
-		return periodoMaximoPrestamo;
+	public Integer getMax_periodo_prestamo() {
+		return max_periodo_prestamo;
 	}
 
-	public void setPeriodoMaximoPrestamo(int periodoMaximoPrestamo) {
-		this.periodoMaximoPrestamo = periodoMaximoPrestamo;
+	public void setMax_periodo_prestamo(Integer max_periodo_prestamo) {
+		this.max_periodo_prestamo = max_periodo_prestamo;
+	}
+
+	public Integer getId_Categoria() {
+		return id_Categoria;
+	}
+
+	public void setId_Categoria(Integer id_Categoria) {
+		this.id_Categoria = id_Categoria;
+	}
+
+	public String getNombre_categoria() {
+		return nombre_categoria;
+	}
+
+	public void setNombre_categoria(String nombre_categoria) {
+		this.nombre_categoria = nombre_categoria;
 	}
 
 	public String getTitulo() {
@@ -78,38 +97,28 @@ public class Producto {
 		this.titulo = titulo;
 	}
 
-	public Date getFechaInActivacion() {
-		return fechaInActivacion;
+	public Date getFecha_llegada_biblioteca() {
+		return fecha_llegada_biblioteca;
 	}
 
-	public void setFechaInActivacion(Date fechaInActivacion) {
-		this.fechaInActivacion = fechaInActivacion;
+	public void setFecha_llegada_biblioteca(Date fecha_llegada_biblioteca) {
+		this.fecha_llegada_biblioteca = fecha_llegada_biblioteca;
 	}
 
-	public Date getFechaIngreso() {
-		return fechaIngreso;
+	public Integer getCantidad_ejemplares_disponibles() {
+		return cantidad_ejemplares_disponibles;
 	}
 
-	public void setFechaIngreso(Date fechaIngreso) {
-		this.fechaIngreso = fechaIngreso;
+	public void setCantidad_ejemplares_disponibles(Integer cantidad_ejemplares_disponibles) {
+		this.cantidad_ejemplares_disponibles = cantidad_ejemplares_disponibles;
 	}
 
-	public List<Autor> getAutores() {
+	public String getAutores() {
 		return autores;
 	}
 
-	public void setAutores(List<Autor> autores) {
+	public void setAutores(String autores) {
 		this.autores = autores;
 	}
-
-	public List<Mantenimiento> getMantenimientos() {
-		return mantenimientos;
-	}
-
-	public void setMantenimientos(List<Mantenimiento> mantenimientos) {
-		this.mantenimientos = mantenimientos;
-	}
-
-*/
-
+	
 }

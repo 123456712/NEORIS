@@ -2,6 +2,7 @@ package com.claro.WSCarMaintence.servicio.ws.rest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.ParameterMode;
@@ -30,33 +31,37 @@ public class CategoriaController {
 		this.entityManager = entityManager;
 	}
 	
-	@GetMapping(path = "/consultar}")
+	@GetMapping(path = "/consultar")
 	public ResponseEntity <List <Categoria>> consultarCategoria(
 			@RequestParam(name = "id_categoria", required = false) Integer id_categoria) {
-		List <Categoria> categoria = new ArrayList<Categoria>();		
-		 
-	StoredProcedureQuery storedProcedureQuery = entityManager
-			.createStoredProcedureQuery("biblioteca.PRC_ADM_CATEGORIAS");
-	
-	// Registrar los parámetros de entrada y salida
-	storedProcedureQuery.registerStoredProcedureParameter("IN_ACCION", String.class, ParameterMode.IN);
-	storedProcedureQuery.registerStoredProcedureParameter("IN_ID_CATEGORIA", Integer.class, ParameterMode.IN);
-	storedProcedureQuery.registerStoredProcedureParameter("IN_NOMBRE_CATEGORIA", String.class, ParameterMode.IN);
-	storedProcedureQuery.registerStoredProcedureParameter("OUT_CODIGO", Integer.class, ParameterMode.OUT);
-	storedProcedureQuery.registerStoredProcedureParameter("OUT_DESCRIPCION", String.class, ParameterMode.OUT);
-	
-	// Configuramos el valor de entrada
-	storedProcedureQuery.setParameter("IN_ACCION", "c");
-	storedProcedureQuery.setParameter("IN_ID_CATEGORIA", id_categoria);
+		
+		List <Categoria> listaCategorias = new ArrayList<Categoria>();	
+		try {
+			StoredProcedureQuery storedProcedureQuery = entityManager
+					.createStoredProcedureQuery("biblioteca.PRC_ADM_CATEGORIAS");
+			
+			// Registrar los parámetros de entrada y salida
+			storedProcedureQuery.registerStoredProcedureParameter("IN_ACCION", String.class, ParameterMode.IN);
+			storedProcedureQuery.registerStoredProcedureParameter("IN_ID_CATEGORIA", Integer.class, ParameterMode.IN);
+			storedProcedureQuery.registerStoredProcedureParameter("IN_NOMBRE_CATEGORIA", String.class, ParameterMode.IN);
+			storedProcedureQuery.registerStoredProcedureParameter("OUT_CODIGO", Integer.class, ParameterMode.OUT);
+			storedProcedureQuery.registerStoredProcedureParameter("OUT_DESCRIPCION", String.class, ParameterMode.OUT);
+			
+			// Configuramos el valor de entrada
+			storedProcedureQuery.setParameter("IN_ACCION", "c");
+			storedProcedureQuery.setParameter("IN_ID_CATEGORIA", id_categoria);
 
-	// Realizamos la llamada al procedimiento
-	storedProcedureQuery.execute();
-	categoria = (List <Categoria>) storedProcedureQuery.getResultList();
-
-	// Obtenemos los valores de salida
-	final Integer codigo = (Integer) storedProcedureQuery.getOutputParameterValue("OUT_CODIGO");
-	final String descripcion = (String) storedProcedureQuery.getOutputParameterValue("OUT_DESCRIPCION");	
-	
-	return ResponseEntity.status(HttpStatus.OK).body(categoria);
+			// Realizamos la llamada al procedimiento
+			storedProcedureQuery.execute();
+			List<Object[]> results = storedProcedureQuery.getResultList();
+			listaCategorias = results.stream().map(result -> new Categoria((Integer) result[0],(String) result[1])).collect(Collectors.toList());
+			
+			// Obtenemos los valores de salida
+			final Integer codigo = (Integer) storedProcedureQuery.getOutputParameterValue("OUT_CODIGO");
+			final String descripcion = (String) storedProcedureQuery.getOutputParameterValue("OUT_DESCRIPCION");
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+	return ResponseEntity.status(HttpStatus.OK).body(listaCategorias);
 	}
 }

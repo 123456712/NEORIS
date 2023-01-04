@@ -1,7 +1,9 @@
 package com.claro.WSCarMaintence.servicio.ws.rest;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.ParameterMode;
@@ -13,10 +15,15 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.claro.WSCarMaintence.DTO.RequestSolicitarPrestamo;
+import com.claro.WSCarMaintence.DTO.ResponsePrestamoDTO;
+import com.claro.WSCarMaintence.model.Autor;
 import com.claro.WSCarMaintence.model.Prestamo;
 
 @RestController
@@ -32,68 +39,94 @@ public class PrestamoController {
 	} 
 
 	@PostMapping(path = "/solicitar")
-	public ResponseEntity <List<Prestamo>> solicitarPrestamo(
-			@PathVariable(required = true, name = "fk_id_usuario") Integer fk_id_usuario,
-			@PathVariable(required = true, name = "fk_id_producto") Integer fk_id_producto) {
+	public ResponseEntity <ResponsePrestamoDTO> solicitarPrestamo(
+			@RequestBody(required = true) RequestSolicitarPrestamo request) {
 
-		List <Prestamo> prestamo = new ArrayList<Prestamo>();
-		StoredProcedureQuery storedProcedureQuery = entityManager
-				.createStoredProcedureQuery("biblioteca.PRC_REALIZAR_PRESTAMO"); 
+		ResponsePrestamoDTO response = new ResponsePrestamoDTO();
+		try {
+			StoredProcedureQuery storedProcedureQuery = entityManager
+					.createStoredProcedureQuery("biblioteca.PRC_REALIZAR_PRESTAMO"); 
 
-		// Registrar los parámetros de entrada y salida
-		storedProcedureQuery.registerStoredProcedureParameter("IN_ACCION", String.class, ParameterMode.IN);
-		storedProcedureQuery.registerStoredProcedureParameter("IN_ID_USUARIO", Integer.class, ParameterMode.IN);
-		storedProcedureQuery.registerStoredProcedureParameter("IN_ID_LIBRO", Integer.class, ParameterMode.IN);
-		storedProcedureQuery.registerStoredProcedureParameter("OUT_CODIGO", Integer.class, ParameterMode.OUT);
-		storedProcedureQuery.registerStoredProcedureParameter("OUT_DESCRIPCION", String.class, ParameterMode.OUT);
-		storedProcedureQuery.registerStoredProcedureParameter("OUT_CURSOR_INFO", String.class, ParameterMode.OUT);
- 
-		// Configuramos el valor de entrada
+			// Registrar los parámetros de entrada y salida
+			storedProcedureQuery.registerStoredProcedureParameter("IN_ID_USUARIO", Integer.class, ParameterMode.IN);
+			storedProcedureQuery.registerStoredProcedureParameter("IN_ID_LIBRO", Integer.class, ParameterMode.IN);
+			storedProcedureQuery.registerStoredProcedureParameter("OUT_CODIGO", Integer.class, ParameterMode.OUT);
+			storedProcedureQuery.registerStoredProcedureParameter("OUT_DESCRIPCION", String.class, ParameterMode.OUT);
+	 
+			// Configuramos el valor de entrada
+	        storedProcedureQuery.setParameter("IN_ID_USUARIO", request.getId_usuario());
+	        storedProcedureQuery.setParameter("IN_ID_LIBRO", request.getId_libro());
+	        
+	     // Realizamos la llamada al procedimiento
+	        storedProcedureQuery.execute();
+	        
+	     // Obtenemos los valores de salida
+	     		final Integer codigo = (Integer) storedProcedureQuery.getOutputParameterValue("OUT_CODIGO");
+	     		final String descripcion = (String) storedProcedureQuery.getOutputParameterValue("OUT_DESCRIPCION");
+	     	
+	     	List<Prestamo> listPrestamo =  null;	
+	     	if(codigo == 0) {
+	          List<Object[]> results = storedProcedureQuery.getResultList();
+	          listPrestamo =  new ArrayList<Prestamo>();
+	          listPrestamo = results.stream().map(result -> new Prestamo(
+	          		(Integer ) result[0],
+	          		(Integer ) result[1],
+	          		(String ) result[2],
+	          		(Date ) result[3],
+	          		(Date ) result[4],
+	          		(Integer ) result[5])).collect(Collectors.toList());
+	     	}	
+	     	
+	     	response.setOut_codigo(codigo);
+	     	response.setOut_descripcion(descripcion);
+	     	response.setListaPrestamo(listPrestamo);
+		} catch (Exception e) {
+			System.out.println(e);
+		}
 		
-        storedProcedureQuery.setParameter("IN_ACCION", "c");
-        storedProcedureQuery.setParameter("IN_ID_USUARIO", fk_id_usuario);
-        storedProcedureQuery.setParameter("IN_ID_LIBRO", fk_id_producto);
 		
-		// Obtenemos los valores de salida
-		final Integer codigo = (Integer) storedProcedureQuery.getOutputParameterValue("OUT_CODIGO");
-		final String descripcion = (String) storedProcedureQuery.getOutputParameterValue("OUT_DESCRIPCION");
-		final String cursor = (String) storedProcedureQuery.getOutputParameterValue("OUT_CURSOR_INFO");
 		
-        // Realizamos la llamada al procedimiento
-        storedProcedureQuery.execute();
-        prestamo = (List <Prestamo>) storedProcedureQuery.getResultList();
-
-		return ResponseEntity.status(HttpStatus.OK).body(prestamo);
+		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
 	@GetMapping(path = "/consultar")
 	public ResponseEntity<List<Prestamo>> consultarPrestamo(
-			@PathVariable(required = true, name = "id_usuario") Integer id_usuario,
-			@PathVariable(required = true, name = "id_libro") Integer id_libro) {
-		List<Prestamo> listPrestamo =  new ArrayList<Prestamo>();
-		if (id_usuario == null && id_libro == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(listPrestamo);
-		}
+			@RequestParam(required = false, name = "id_usuario") Integer id_usuario,
+			@RequestParam(required = false, name = "id_libro") Integer id_libro) {
 		
-		StoredProcedureQuery storedProcedureQuery = entityManager
-				.createStoredProcedureQuery("biblioteca.PRC_REALIZAR_PRESTAMO");
-		// Registrar los parámetros de entrada y salida
-		storedProcedureQuery.registerStoredProcedureParameter("IN_ACCION", String.class, ParameterMode.IN);
-		storedProcedureQuery.registerStoredProcedureParameter("IN_ID_USUARIO", Integer.class, ParameterMode.IN);
-		storedProcedureQuery.registerStoredProcedureParameter("IN_ID_LIBRO", Integer.class, ParameterMode.IN);
-		storedProcedureQuery.registerStoredProcedureParameter("OUT_CODIGO", Integer.class, ParameterMode.OUT);
-		storedProcedureQuery.registerStoredProcedureParameter("OUT_DESCRIPCION", String.class, ParameterMode.OUT);
-		storedProcedureQuery.registerStoredProcedureParameter("OUT_CURSOR_INFO", String.class, ParameterMode.OUT);
+		List<Prestamo> listPrestamo =  new ArrayList<Prestamo>();
+		
+		try {
+			StoredProcedureQuery storedProcedureQuery = entityManager
+					.createStoredProcedureQuery("biblioteca.PRC_CONSULTAR_PRESTAMOS");
+			// Registrar los parámetros de entrada y salida
+			storedProcedureQuery.registerStoredProcedureParameter("IN_ID_USUARIO", Integer.class, ParameterMode.IN);
+			storedProcedureQuery.registerStoredProcedureParameter("IN_ID_LIBRO", Integer.class, ParameterMode.IN);
+			storedProcedureQuery.registerStoredProcedureParameter("OUT_CODIGO", Integer.class, ParameterMode.OUT);
+			storedProcedureQuery.registerStoredProcedureParameter("OUT_DESCRIPCION", String.class, ParameterMode.OUT);
 
-		// Configuramos el valor de entrada
-		storedProcedureQuery.setParameter("IN_ACCION", "c");
-		storedProcedureQuery.setParameter("IN_ID_USUARIO", null);
-		storedProcedureQuery.setParameter("IN_ID_LIBRO", null);
+			// Configuramos el valor de entrada
+			storedProcedureQuery.setParameter("IN_ID_USUARIO", id_usuario);
+			storedProcedureQuery.setParameter("IN_ID_LIBRO", id_libro);
+			
+			// Realizamos la llamada al procedimiento
+	        storedProcedureQuery.execute();
+	        List<Object[]> results = storedProcedureQuery.getResultList();
+	        listPrestamo = results.stream().map(result -> new Prestamo(
+	        		(Integer ) result[0],
+	        		(Integer ) result[1],
+	        		(String ) result[2],
+	        		(Date ) result[3],
+	        		(Date ) result[4],
+	        		(Integer ) result[5])).collect(Collectors.toList());
+	 
 
-		// Obtenemos los valores de salida
-		final Integer codigo = (Integer) storedProcedureQuery.getOutputParameterValue("OUT_CODIGO");
-		final String descripcion = (String) storedProcedureQuery.getOutputParameterValue("OUT_DESCRIPCION");
-		final String cursor = (String) storedProcedureQuery.getOutputParameterValue("OUT_CURSOR_INFO");	
+			// Obtenemos los valores de salida
+			final Integer codigo = (Integer) storedProcedureQuery.getOutputParameterValue("OUT_CODIGO");
+			final String descripcion = (String) storedProcedureQuery.getOutputParameterValue("OUT_DESCRIPCION");
+		} catch (Exception e) {
+			System.out.println(e);
+		}
 		
 		return ResponseEntity.status(HttpStatus.OK).body(listPrestamo);
 	}

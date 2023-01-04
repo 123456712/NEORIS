@@ -1,10 +1,3 @@
-
-import java.util.List;
-
-
-import com.claro.WSCarMaintence.interfase.MecanicoRepository;
-import com.claro.WSCarMaintence.model.Mecanicos;
-
 //@SpringBootTest
 public class RepositoryTest {
 
