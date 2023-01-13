@@ -195,6 +195,13 @@
 			<groupId>javax.persistence</groupId>
 			<artifactId>javax.persistence-api</artifactId>
 		</dependency>
+		
+		 <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc8</artifactId>
+            <version>01</version>
+        </dependency>
+        
 	</dependencies>
 
 	<build>
